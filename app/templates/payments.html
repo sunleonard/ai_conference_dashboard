@@ -1,0 +1,119 @@
+<!-- templates/payments.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-credit-card"></i> Payments</h1>
+    <div class="btn-group">
+        <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="fas fa-filter"></i> Filter
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">All Payments</a></li>
+            <li><a class="dropdown-item" href="#">Pending</a></li>
+            <li><a class="dropdown-item" href="#">Completed</a></li>
+            <li><a class="dropdown-item" href="#">Failed</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Attendee</th>
+                        <th>Conference</th>
+                        <th>Amount</th>
+                        <th>Payment Method</th>
+                        <th>Status</th>
+                        <th>Payment Date</th>
+                        <th>Transaction ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td>#{{ payment.booking.id }}</td>
+                        <td>{{ payment.booking.attendee_name }}</td>
+                        <td>{{ payment.booking.conference.title }}</td>
+                        <td>${{ "%.2f"|format(payment.amount) }}</td>
+                        <td>{{ payment.payment_method }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if payment.payment_status == 'Completed' else 'warning' if payment.payment_status == 'Pending' else 'danger' if payment.payment_status == 'Failed' else 'info' }}">
+                                {{ payment.payment_status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if payment.payment_date %}
+                                {{ payment.payment_date.strftime('%Y-%m-%d %H:%M') }}
+                            {% else %}
+                                <span class="text-muted">Not paid</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ payment.transaction_id or '-' }}</td>
+                        <td>
+                            {% if payment.payment_status == 'Pending' %}
+                            <div class="btn-group btn-group-sm">
+                                <form method="POST" action="{{ url_for('update_payment_status', payment_id=payment.id) }}" style="display: inline;">
+                                    <input type="hidden" name="status" value="Completed">
+                                    <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Mark payment as completed?')">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('update_payment_status', payment_id=payment.id) }}" style="display: inline;">
+                                    <input type="hidden" name="status" value="Failed">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Mark payment as failed?')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Summary Cards -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <h5 class="text-success">Completed Payments</h5>
+                <h3>${{ payments|selectattr('payment_status', 'equalto', 'Completed')|map(attribute='amount')|sum|round(2) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <h5 class="text-warning">Pending Payments</h5>
+                <h3>${{ payments|selectattr('payment_status', 'equalto', 'Pending')|map(attribute='amount')|sum|round(2) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <h5 class="text-danger">Failed Payments</h5>
+                <h3>${{ payments|selectattr('payment_status', 'equalto', 'Failed')|map(attribute='amount')|sum|round(2) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h5>Total Revenue</h5>
+                <h3>${{ payments|selectattr('payment_status', 'equalto', 'Completed')|map(attribute='amount')|sum|round(2) }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+<!-- templates/add_booking.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-ticket-alt"></i> Add New Booking</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Attendee Name *</label>
+                            <input type="text" class="form-control" name="attendee_name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Attendee Email *</label>
+                            <input type="email" class="form-control" name="attendee_email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Attendee Phone</label>
+                        <input type="tel" class="form-control" name="attendee_phone">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Conference *</label>
+                        <select class="form-control" name="conference_id" required id="conferenceSelect">
+                            <option value="">Select Conference</option>
+                            {% for conference in conferences %}
+                                <option value="{{ conference.id }}" data-price="{{ conference.price }}">
+                                    {{ conference.title }} - {{ conference.location }} (${{ "%.2f"|format(conference.price) }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Company *</label>
+                        <select class="form-control" name="company_id" required>
+                            <option value="">Select Company</option>
+                            {% for company in companies %}
+                                <option value="{{ company.id }}">{{ company.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="alert alert-info" id="priceInfo" style="display: none;">
+                        <strong>Conference Price:</strong> $<span id="selectedPrice">0.00</span>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Booking
+                        </button>
+                        <a href="{{ url_for('bookings') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Bookings
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('conferenceSelect').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const price = selectedOption.getAttribute('data-price');
+    const priceInfo = document.getElementById('priceInfo');
+    const selectedPrice = document.getElementById('selectedPrice');
+    
+    if (price) {
+        selectedPrice.textContent = parseFloat(price).toFixed(2);
+        priceInfo.style.display = 'block';
+    } else {
+        priceInfo.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}
