@@ -87,7 +87,7 @@
         <div class="card bg-light">
             <div class="card-body text-center">
                 <h5 class="text-success">Completed Payments</h5>
-                <h3>${{ payments|selectattr('payment_status', 'equalto', 'Completed')|map(attribute='amount')|sum|round(2) }}</h3>
+                <h3>${{ "%.2f"|format(completed_total) }}</h3>
             </div>
         </div>
     </div>
@@ -95,7 +95,7 @@
         <div class="card bg-light">
             <div class="card-body text-center">
                 <h5 class="text-warning">Pending Payments</h5>
-                <h3>${{ payments|selectattr('payment_status', 'equalto', 'Pending')|map(attribute='amount')|sum|round(2) }}</h3>
+                <h3>${{ "%.2f"|format(pending_total) }}</h3>
             </div>
         </div>
     </div>
@@ -103,7 +103,7 @@
         <div class="card bg-light">
             <div class="card-body text-center">
                 <h5 class="text-danger">Failed Payments</h5>
-                <h3>${{ payments|selectattr('payment_status', 'equalto', 'Failed')|map(attribute='amount')|sum|round(2) }}</h3>
+                <h3>${{ "%.2f"|format(failed_total) }}</h3>
             </div>
         </div>
     </div>
@@ -111,7 +111,7 @@
         <div class="card bg-primary text-white">
             <div class="card-body text-center">
                 <h5>Total Revenue</h5>
-                <h3>${{ payments|selectattr('payment_status', 'equalto', 'Completed')|map(attribute='amount')|sum|round(2) }}</h3>
+                <h3>${{ "%.2f"|format(completed_total) }}</h3>
             </div>
         </div>
     </div>
