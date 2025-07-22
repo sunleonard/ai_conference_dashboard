@@ -1,0 +1,152 @@
+<!-- app/templates/edit_company.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3><i class="fas fa-edit"></i> Edit Company: {{ company.name }}</h3>
+                <a href="{{ url_for('companies.detail', id=company.id) }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-eye"></i> View Details
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <!-- Basic Company Information -->
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5 class="mb-3"><i class="fas fa-info-circle"></i> Basic Information</h5>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Company Name *</label>
+                                    <input type="text" class="form-control" name="name" value="{{ company.name }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Industry</label>
+                                    <input type="text" class="form-control" name="industry" value="{{ company.industry }}">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Website</label>
+                                    <input type="url" class="form-control" name="website" value="{{ company.website or '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Contact Email</label>
+                                    <input type="email" class="form-control" name="contact_email" value="{{ company.contact_email or '' }}">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" name="phone" value="{{ company.phone or '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Headquarters</label>
+                                    <input type="text" class="form-control" name="headquarters" value="{{ details.headquarters or '' }}">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Company Description</label>
+                                <textarea class="form-control" name="description" rows="3">{{ company.description or '' }}</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Business Details -->
+                        <div class="col-md-4">
+                            <h5 class="mb-3"><i class="fas fa-chart-line"></i> Business Details</h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Founded Year</label>
+                                <input type="number" class="form-control" name="founded_year" 
+                                       min="1800" max="2025" value="{{ details.founded_year or '' }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Number of Employees</label>
+                                <input type="number" class="form-control" name="num_employees" 
+                                       min="1" value="{{ details.num_employees or '' }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Annual Revenue (USD)</label>
+                                <input type="number" class="form-control" name="annual_revenue" 
+                                       min="0" step="1000000" value="{{ details.annual_revenue or '' }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Funding Stage</label>
+                                <select class="form-control" name="funding_stage">
+                                    <option value="">Select Stage</option>
+                                    <option value="Pre-Seed" {% if details.funding_stage == 'Pre-Seed' %}selected{% endif %}>Pre-Seed</option>
+                                    <option value="Seed" {% if details.funding_stage == 'Seed' %}selected{% endif %}>Seed</option>
+                                    <option value="Series A" {% if details.funding_stage == 'Series A' %}selected{% endif %}>Series A</option>
+                                    <option value="Series B" {% if details.funding_stage == 'Series B' %}selected{% endif %}>Series B</option>
+                                    <option value="Series C" {% if details.funding_stage == 'Series C' %}selected{% endif %}>Series C</option>
+                                    <option value="Series D+" {% if details.funding_stage == 'Series D+' %}selected{% endif %}>Series D+</option>
+                                    <option value="IPO" {% if details.funding_stage == 'IPO' %}selected{% endif %}>IPO</option>
+                                    <option value="Public" {% if details.funding_stage == 'Public' %}selected{% endif %}>Public</option>
+                                    <option value="Private" {% if details.funding_stage == 'Private' %}selected{% endif %}>Private</option>
+                                    <option value="Acquired" {% if details.funding_stage == 'Acquired' %}selected{% endif %}>Acquired</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Company
+                        </button>
+                        <a href="{{ url_for('companies.detail', id=company.id) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Details
+                        </a>
+                        <a href="{{ url_for('companies.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-list"></i> All Companies
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Company Preview Card -->
+<div class="row justify-content-center mt-4">
+    <div class="col-md-10">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h6><i class="fas fa-info-circle me-2"></i>Current Company Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Current Name:</strong> {{ company.name }}</p>
+                        <p><strong>Industry:</strong> {{ company.industry }}</p>
+                        <p><strong>Founded:</strong> {{ details.founded_year or 'Not set' }}</p>
+                        <p><strong>Employees:</strong> {{ details.num_employees or 'Not set' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Revenue:</strong> 
+                            {% if details.annual_revenue %}
+                                ${{ "{:,.0f}".format(details.annual_revenue) }}
+                            {% else %}
+                                Not set
+                            {% endif %}
+                        </p>
+                        <p><strong>Funding:</strong> {{ details.funding_stage or 'Not set' }}</p>
+                        <p><strong>Headquarters:</strong> {{ details.headquarters or 'Not set' }}</p>
+                        <p><strong>Created:</strong> {{ company.created_date.strftime('%B %d, %Y') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

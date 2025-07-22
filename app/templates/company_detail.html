@@ -1,0 +1,231 @@
+<!-- app/templates/company_detail.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1><i class="fas fa-building"></i> {{ company.name }}</h1>
+        <p class="text-muted mb-0">{{ company.industry }} • <small>Company Details (Read-Only)</small></p>
+    </div>
+    <div class="btn-group">
+        <a href="{{ url_for('companies.edit', id=company.id) }}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit Company
+        </a>
+        <button type="button" class="btn btn-outline-danger" 
+                onclick="confirmDelete({{ company.id }}, '{{ company.name }}')">
+            <i class="fas fa-trash"></i> Delete
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Company Overview -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle me-2"></i>Company Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Website:</strong> 
+                            {% if company.website %}
+                                <a href="{{ company.website }}" target="_blank">{{ company.website }}</a>
+                            {% else %}
+                                <span class="text-muted">Not provided</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Contact Email:</strong> {{ company.contact_email or 'Not provided' }}</p>
+                        <p><strong>Phone:</strong> {{ company.phone or 'Not provided' }}</p>
+                        <p><strong>Headquarters:</strong> {{ details.headquarters or 'Not provided' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Founded:</strong> {{ details.founded_year or 'Not provided' }}</p>
+                        <p><strong>Employees:</strong> 
+                            {% if details.num_employees %}
+                                {{ "{:,}".format(details.num_employees) }}
+                            {% else %}
+                                Not provided
+                            {% endif %}
+                        </p>
+                        <p><strong>Annual Revenue:</strong>
+                            {% if details.annual_revenue %}
+                                ${{ "{:,.0f}".format(details.annual_revenue) }}
+                            {% else %}
+                                Not provided
+                            {% endif %}
+                        </p>
+                        <p><strong>Funding Stage:</strong> {{ details.funding_stage or 'Not provided' }}</p>
+                    </div>
+                </div>
+                
+                {% if company.description %}
+                <hr>
+                <h6>Description</h6>
+                <p>{{ company.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Business Intelligence Section -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-chart-line me-2"></i>Business Intelligence & Stock Information</h5>
+                <button type="button" class="btn btn-sm btn-outline-primary" 
+                        data-bs-toggle="modal" data-bs-target="#addIntelligenceModal">
+                    <i class="fas fa-plus"></i> Add Insight
+                </button>
+            </div>
+            <div class="card-body">
+                {% if intelligence %}
+                    {% for item in intelligence %}
+                    <div class="alert alert-light d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>{{ item.insight_type }}</strong>
+                            <p class="mb-1">{{ item.insight_text }}</p>
+                            <small class="text-muted">
+                                Source: {{ item.source or 'Not specified' }} • 
+                                {{ item.collected_date.strftime('%Y-%m-%d') }}
+                            </small>
+                        </div>
+                        <form method="POST" action="{{ url_for('companies.delete_intelligence', id=item.id) }}" 
+                              style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                    onclick="return confirm('Delete this insight?')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center py-3">
+                        <i class="fas fa-chart-line fa-2x mb-2 d-block"></i>
+                        No business intelligence data available.<br>
+                        <small>Add stock prices, market insights, or business updates.</small>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6><i class="fas fa-chart-bar me-2"></i>Quick Stats</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-12 mb-3">
+                        <h4 class="text-primary">{{ company.conferences|length }}</h4>
+                        <small class="text-muted">Conferences</small>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <h4 class="text-success">{{ company.bookings|length }}</h4>
+                        <small class="text-muted">Total Bookings</small>
+                    </div>
+                    <div class="col-12">
+                        <h4 class="text-info">{{ intelligence|length }}</h4>
+                        <small class="text-muted">Intelligence Records</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-clock me-2"></i>Timeline</h6>
+            </div>
+            <div class="card-body">
+                <p><small class="text-muted">Created: {{ company.created_date.strftime('%B %d, %Y') }}</small></p>
+                {% if company.conferences %}
+                    <p><small class="text-muted">Latest Conference: 
+                        {{ company.conferences[-1].created_date.strftime('%B %d, %Y') }}</small></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Intelligence Modal -->
+<div class="modal fade" id="addIntelligenceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Business Intelligence</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('companies.add_intelligence', id=company.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Type *</label>
+                        <select class="form-control" name="insight_type" required>
+                            <option value="">Select Type</option>
+                            <option value="Stock Price">Stock Price</option>
+                            <option value="Market Analysis">Market Analysis</option>
+                            <option value="Financial Report">Financial Report</option>
+                            <option value="Decision Maker">Decision Maker</option>
+                            <option value="Partnership">Partnership</option>
+                            <option value="Product Launch">Product Launch</option>
+                            <option value="Funding News">Funding News</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Information *</label>
+                        <textarea class="form-control" name="insight_text" rows="4" required
+                                  placeholder="Enter stock price, decision maker details, market insights, etc."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Source</label>
+                        <input type="text" class="form-control" name="source" 
+                               placeholder="e.g., Yahoo Finance, Bloomberg, Company Website">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Intelligence</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="companyName"></strong>?</p>
+                <p class="text-danger">⚠️ This will also delete all associated conferences and bookings!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete Company</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{{ url_for('companies.index') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Companies
+    </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDelete(companyId, companyName) {
+    document.getElementById('companyName').textContent = companyName;
+    document.getElementById('deleteForm').action = `/companies/${companyId}/delete`;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

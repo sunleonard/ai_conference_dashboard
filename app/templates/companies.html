@@ -1,4 +1,4 @@
-<!-- templates/companies.html -->
+<!-- app/templates/companies.html -->
 {% extends "base.html" %}
 
 {% block content %}
@@ -21,12 +21,19 @@
                         <th>Contact Email</th>
                         <th>Phone</th>
                         <th>Created Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for company in companies %}
                     <tr>
-                        <td><strong>{{ company.name }}</strong></td>
+                        <td>
+                            <strong>
+                                <a href="{{ url_for('companies.detail', id=company.id) }}" class="text-decoration-none text-primary">
+                                    {{ company.name }}
+                                </a>
+                            </strong>
+                        </td>
                         <td>{{ company.industry }}</td>
                         <td>
                             {% if company.website %}
@@ -40,6 +47,22 @@
                         <td>{{ company.contact_email or '-' }}</td>
                         <td>{{ company.phone or '-' }}</td>
                         <td>{{ company.created_date.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('companies.detail', id=company.id) }}" 
+                                   class="btn btn-outline-info btn-sm" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('companies.edit', id=company.id) }}" 
+                                   class="btn btn-outline-primary btn-sm" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger btn-sm" 
+                                        title="Delete" onclick="confirmDelete({{ company.id }}, '{{ company.name }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -47,4 +70,36 @@
         </div>
     </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="companyName"></strong>?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete Company</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDelete(companyId, companyName) {
+    document.getElementById('companyName').textContent = companyName;
+    document.getElementById('deleteForm').action = `/companies/${companyId}/delete`;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
 {% endblock %}

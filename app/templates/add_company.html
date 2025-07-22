@@ -1,54 +1,109 @@
-<!-- templates/add_company.html -->
+<!-- app/templates/add_company.html -->
 {% extends "base.html" %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-md-10">
         <div class="card">
             <div class="card-header">
                 <h3><i class="fas fa-building"></i> Add New Company</h3>
             </div>
             <div class="card-body">
                 <form method="POST">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Company Name *</label>
-                            <input type="text" class="form-control" name="name" required>
+                    <!-- Basic Company Information -->
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5 class="mb-3"><i class="fas fa-info-circle"></i> Basic Information</h5>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Company Name *</label>
+                                    <input type="text" class="form-control" name="name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Industry</label>
+                                    <input type="text" class="form-control" name="industry" value="Artificial Intelligence">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Website</label>
+                                    <input type="url" class="form-control" name="website" placeholder="https://example.com">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Contact Email</label>
+                                    <input type="email" class="form-control" name="contact_email">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" name="phone">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Headquarters</label>
+                                    <input type="text" class="form-control" name="headquarters" placeholder="City, Country">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Company Description</label>
+                                <textarea class="form-control" name="description" rows="3" 
+                                          placeholder="Brief description of the company..."></textarea>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Industry</label>
-                            <input type="text" class="form-control" name="industry" value="Artificial Intelligence">
+                        
+                        <!-- Business Details -->
+                        <div class="col-md-4">
+                            <h5 class="mb-3"><i class="fas fa-chart-line"></i> Business Details</h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Founded Year</label>
+                                <input type="number" class="form-control" name="founded_year" 
+                                       min="1800" max="2025" placeholder="e.g., 2010">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Number of Employees</label>
+                                <input type="number" class="form-control" name="num_employees" 
+                                       min="1" placeholder="e.g., 250">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Annual Revenue (USD)</label>
+                                <input type="number" class="form-control" name="annual_revenue" 
+                                       min="0" step="1000000" placeholder="e.g., 50000000">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Funding Stage</label>
+                                <select class="form-control" name="funding_stage">
+                                    <option value="">Select Stage</option>
+                                    <option value="Pre-Seed">Pre-Seed</option>
+                                    <option value="Seed">Seed</option>
+                                    <option value="Series A">Series A</option>
+                                    <option value="Series B">Series B</option>
+                                    <option value="Series C">Series C</option>
+                                    <option value="Series D+">Series D+</option>
+                                    <option value="IPO">IPO</option>
+                                    <option value="Public">Public</option>
+                                    <option value="Private">Private</option>
+                                    <option value="Acquired">Acquired</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Website</label>
-                            <input type="url" class="form-control" name="website" placeholder="https://example.com">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Contact Email</label>
-                            <input type="email" class="form-control" name="contact_email">
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Phone Number</label>
-                        <input type="tel" class="form-control" name="phone">
-                    </div>
-                    
-
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" name="description" rows="3"></textarea>
-                    </div>
+                    <hr>
                     
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> Save Company
                         </button>
                         <a href="{{ url_for('companies.index') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left"></i> Back to Companies
+                            <i class="fas fa-arrow-left"></i> Back to Companies List
                         </a>
                     </div>
                 </form>
